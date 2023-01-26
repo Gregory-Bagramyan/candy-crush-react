@@ -5,9 +5,11 @@ const candyColors = ["blue", "green", "orange", "purple", "red", "yellow"];
 
 const App = () => {
   const [currentColorArrangment, setCurrentColorArrangment] = useState([]);
+  const [squarebeingDragged, setSquareBeingDragged] = useState(null);
+  const [squarebeingReplaced, setSquareBeingReplaced] = useState(null);
 
   const checkForColumnOfThree = () => {
-    for (let i = 0; i < 47; i++) {
+    for (let i = 0; i <= 47; i++) {
       const columnOfThree = [i, i + width, i + width * 2];
       const decidedColor = currentColorArrangment[i];
 
@@ -19,12 +21,13 @@ const App = () => {
         columnOfThree.forEach(
           (square) => (currentColorArrangment[square] = "")
         );
+        return true;
       }
     }
   };
 
   const checkForColumnOfFour = () => {
-    for (let i = 0; i < 39; i++) {
+    for (let i = 0; i <= 39; i++) {
       const columnOfFour = [i, i + width, i + width * 2, i + width * 3];
       const decidedColor = currentColorArrangment[i];
 
@@ -34,6 +37,7 @@ const App = () => {
         )
       ) {
         columnOfFour.forEach((square) => (currentColorArrangment[square] = ""));
+        return true;
       }
     }
   };
@@ -53,6 +57,7 @@ const App = () => {
         )
       ) {
         rowOfThree.forEach((square) => (currentColorArrangment[square] = ""));
+        return true;
       }
     }
   };
@@ -73,12 +78,13 @@ const App = () => {
         )
       ) {
         rowOfFour.forEach((square) => (currentColorArrangment[square] = ""));
+        return true;
       }
     }
   };
 
   const moveIntoSquareBelow = () => {
-    for (let i = 0; i < 64 - width; i++) {
+    for (let i = 0; i < 55; i++) {
       const firstRow = [0, 1, 2, 3, 4, 5, 6, 7];
       const isFirstRow = firstRow.includes(i);
       if (isFirstRow && currentColorArrangment[i] === "") {
@@ -90,6 +96,69 @@ const App = () => {
         currentColorArrangment[i] = "";
       }
     }
+  };
+
+  const dragStart = (e) => {
+    console.log(e.target);
+    console.log("drag start");
+    setSquareBeingDragged(e.target);
+  };
+
+  const dragDrop = (e) => {
+    console.log(e.target);
+    console.log("drag drop");
+    setSquareBeingReplaced(e.target);
+  };
+
+  const dragEnd = (e) => {
+    console.log("drag end");
+
+    const squarebeinDraggedId = parseInt(
+      squarebeingDragged.getAttribute("data-id")
+    );
+
+    const squarebeinReplacedId = parseInt(
+      squarebeingReplaced.getAttribute("data-id")
+    );
+
+    currentColorArrangment[squarebeinReplacedId] =
+      squarebeingDragged.style.backgroundColor;
+    currentColorArrangment[squarebeinDraggedId] =
+      squarebeingReplaced.style.backgroundColor;
+
+    console.log("squarebeinDraggedId", squarebeinDraggedId);
+    console.log("squarebeingReplacedId", squarebeinReplacedId);
+
+    const validMoves = [
+      squarebeinDraggedId - 1,
+      squarebeinDraggedId + width,
+      squarebeinDraggedId - width,
+      squarebeinDraggedId + 1,
+    ];
+
+    const validMove = validMoves.includes(squarebeinReplacedId);
+
+    const isAColumnOfFour = checkForColumnOfFour();
+    const isARowOfFour = checkForRowOfFour();
+
+    const isAColumnOfThree = checkForColumnOfThree();
+    const isARowOfThree = checkForRowOfThree();
+
+    if (
+      squarebeinReplacedId &&
+      validMove &&
+      (isAColumnOfFour || isARowOfFour || isAColumnOfThree || isARowOfThree)
+    ) {
+      console.log("validMove", validMove);
+      setSquareBeingDragged(null);
+      setSquareBeingReplaced(null);
+    } else {
+      currentColorArrangment[squarebeinReplacedId] =
+        squarebeingReplaced.style.backgroundColor;
+      currentColorArrangment[squarebeinDraggedId] =
+        squarebeingDragged.style.backgroundColor;
+    }
+    setCurrentColorArrangment([...currentColorArrangment]);
   };
 
   const createBoard = () => {
@@ -126,8 +195,6 @@ const App = () => {
     currentColorArrangment,
   ]);
 
-  console.log(currentColorArrangment);
-
   return (
     <div className="app">
       <div className="game">
@@ -136,6 +203,14 @@ const App = () => {
             key={index}
             style={{ backgroundColor: candyColor }}
             alt={candyColor}
+            data-id={index}
+            draggable={true}
+            onDragStart={dragStart}
+            onDragOver={(e) => e.preventDefault()}
+            onDragEnter={(e) => e.preventDefault()}
+            onDragLeave={(e) => e.preventDefault()}
+            onDrop={dragDrop}
+            onDragEnd={dragEnd}
           />
         ))}
       </div>
