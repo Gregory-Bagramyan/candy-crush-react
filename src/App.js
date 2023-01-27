@@ -1,7 +1,20 @@
 import { useState, useEffect } from "react";
-
+import blueCandy from "./images/blue-candy.png";
+import greeenCandy from "./images/green-candy.png";
+import orangeCandy from "./images/orange-candy.png";
+import purpleCandy from "./images/purple-candy.png";
+import redCandy from "./images/red-candy.png";
+import yellowCandy from "./images/yellow-candy.png";
+import blank from "./images/blank.png";
 const width = 8;
-const candyColors = ["blue", "green", "orange", "purple", "red", "yellow"];
+const candyColors = [
+  blueCandy,
+  greeenCandy,
+  orangeCandy,
+  purpleCandy,
+  redCandy,
+  yellowCandy,
+];
 
 const App = () => {
   const [currentColorArrangment, setCurrentColorArrangment] = useState([]);
@@ -19,7 +32,7 @@ const App = () => {
         )
       ) {
         columnOfThree.forEach(
-          (square) => (currentColorArrangment[square] = "")
+          (square) => (currentColorArrangment[square] = blank)
         );
         return true;
       }
@@ -36,7 +49,9 @@ const App = () => {
           (square) => currentColorArrangment[square] === decidedColor
         )
       ) {
-        columnOfFour.forEach((square) => (currentColorArrangment[square] = ""));
+        columnOfFour.forEach(
+          (square) => (currentColorArrangment[square] = blank)
+        );
         return true;
       }
     }
@@ -56,7 +71,9 @@ const App = () => {
           (square) => currentColorArrangment[square] === decidedColor
         )
       ) {
-        rowOfThree.forEach((square) => (currentColorArrangment[square] = ""));
+        rowOfThree.forEach(
+          (square) => (currentColorArrangment[square] = blank)
+        );
         return true;
       }
     }
@@ -77,7 +94,7 @@ const App = () => {
           (square) => currentColorArrangment[square] === decidedColor
         )
       ) {
-        rowOfFour.forEach((square) => (currentColorArrangment[square] = ""));
+        rowOfFour.forEach((square) => (currentColorArrangment[square] = blank));
         return true;
       }
     }
@@ -87,13 +104,13 @@ const App = () => {
     for (let i = 0; i < 55; i++) {
       const firstRow = [0, 1, 2, 3, 4, 5, 6, 7];
       const isFirstRow = firstRow.includes(i);
-      if (isFirstRow && currentColorArrangment[i] === "") {
+      if (isFirstRow && currentColorArrangment[i] === blank) {
         let randomNumber = Math.floor(Math.random() * candyColors.length);
         currentColorArrangment[i] = candyColors[randomNumber];
       }
-      if (currentColorArrangment[i + width] === "") {
+      if (currentColorArrangment[i + width] === blank) {
         currentColorArrangment[i + width] = currentColorArrangment[i];
-        currentColorArrangment[i] = "";
+        currentColorArrangment[i] = blank;
       }
     }
   };
@@ -122,9 +139,9 @@ const App = () => {
     );
 
     currentColorArrangment[squarebeinReplacedId] =
-      squarebeingDragged.style.backgroundColor;
+      squarebeingDragged.getAttribute("src");
     currentColorArrangment[squarebeinDraggedId] =
-      squarebeingReplaced.style.backgroundColor;
+      squarebeingReplaced.getAttribute("src");
 
     console.log("squarebeinDraggedId", squarebeinDraggedId);
     console.log("squarebeingReplacedId", squarebeinReplacedId);
@@ -154,9 +171,10 @@ const App = () => {
       setSquareBeingReplaced(null);
     } else {
       currentColorArrangment[squarebeinReplacedId] =
-        squarebeingReplaced.style.backgroundColor;
+        squarebeingReplaced.getAttribute("src");
+
       currentColorArrangment[squarebeinDraggedId] =
-        squarebeingDragged.style.backgroundColor;
+        squarebeingDragged.getAttribute("src");
     }
     setCurrentColorArrangment([...currentColorArrangment]);
   };
@@ -201,7 +219,7 @@ const App = () => {
         {currentColorArrangment.map((candyColor, index) => (
           <img
             key={index}
-            style={{ backgroundColor: candyColor }}
+            src={candyColor}
             alt={candyColor}
             data-id={index}
             draggable={true}
