@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import ScoreBoard from "./components/ScoreBoard.js";
 import blueCandy from "./images/blue-candy.png";
 import greeenCandy from "./images/green-candy.png";
 import orangeCandy from "./images/orange-candy.png";
@@ -20,17 +21,21 @@ const App = () => {
   const [currentColorArrangment, setCurrentColorArrangment] = useState([]);
   const [squarebeingDragged, setSquareBeingDragged] = useState(null);
   const [squarebeingReplaced, setSquareBeingReplaced] = useState(null);
+  const [scoreDisplay, setScoreDisplay] = useState(0);
 
   const checkForColumnOfThree = () => {
     for (let i = 0; i <= 47; i++) {
       const columnOfThree = [i, i + width, i + width * 2];
       const decidedColor = currentColorArrangment[i];
+      const isBlank = currentColorArrangment[i] === blank;
 
       if (
         columnOfThree.every(
-          (square) => currentColorArrangment[square] === decidedColor
+          (square) =>
+            currentColorArrangment[square] === decidedColor && !isBlank
         )
       ) {
+        setScoreDisplay((score) => score + 3);
         columnOfThree.forEach(
           (square) => (currentColorArrangment[square] = blank)
         );
@@ -43,12 +48,15 @@ const App = () => {
     for (let i = 0; i <= 39; i++) {
       const columnOfFour = [i, i + width, i + width * 2, i + width * 3];
       const decidedColor = currentColorArrangment[i];
+      const isBlank = currentColorArrangment[i] === blank;
 
       if (
         columnOfFour.every(
-          (square) => currentColorArrangment[square] === decidedColor
+          (square) =>
+            currentColorArrangment[square] === decidedColor && !isBlank
         )
       ) {
+        setScoreDisplay((score) => score + 4);
         columnOfFour.forEach(
           (square) => (currentColorArrangment[square] = blank)
         );
@@ -64,13 +72,16 @@ const App = () => {
       const notValid = [
         6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 46, 47, 54, 55, 63, 64,
       ];
+      const isBlank = currentColorArrangment[i] === blank;
 
       if (notValid.includes(i)) continue;
       if (
         rowOfThree.every(
-          (square) => currentColorArrangment[square] === decidedColor
+          (square) =>
+            currentColorArrangment[square] === decidedColor && !isBlank
         )
       ) {
+        setScoreDisplay((score) => score + 3);
         rowOfThree.forEach(
           (square) => (currentColorArrangment[square] = blank)
         );
@@ -87,13 +98,16 @@ const App = () => {
         5, 6, 7, 13, 14, 15, 21, 22, 23, 29, 30, 31, 37, 38, 39, 45, 46, 47, 53,
         54, 55, 62, 63, 64,
       ];
+      const isBlank = currentColorArrangment[i] === blank;
 
       if (notValid.includes(i)) continue;
       if (
         rowOfFour.every(
-          (square) => currentColorArrangment[square] === decidedColor
+          (square) =>
+            currentColorArrangment[square] === decidedColor && !isBlank
         )
       ) {
+        setScoreDisplay((score) => score + 4);
         rowOfFour.forEach((square) => (currentColorArrangment[square] = blank));
         return true;
       }
@@ -115,21 +129,17 @@ const App = () => {
     }
   };
 
+  console.log(scoreDisplay);
+
   const dragStart = (e) => {
-    console.log(e.target);
-    console.log("drag start");
     setSquareBeingDragged(e.target);
   };
 
   const dragDrop = (e) => {
-    console.log(e.target);
-    console.log("drag drop");
     setSquareBeingReplaced(e.target);
   };
 
   const dragEnd = (e) => {
-    console.log("drag end");
-
     const squarebeinDraggedId = parseInt(
       squarebeingDragged.getAttribute("data-id")
     );
@@ -142,9 +152,6 @@ const App = () => {
       squarebeingDragged.getAttribute("src");
     currentColorArrangment[squarebeinDraggedId] =
       squarebeingReplaced.getAttribute("src");
-
-    console.log("squarebeinDraggedId", squarebeinDraggedId);
-    console.log("squarebeingReplacedId", squarebeinReplacedId);
 
     const validMoves = [
       squarebeinDraggedId - 1,
@@ -166,7 +173,6 @@ const App = () => {
       validMove &&
       (isAColumnOfFour || isARowOfFour || isAColumnOfThree || isARowOfThree)
     ) {
-      console.log("validMove", validMove);
       setSquareBeingDragged(null);
       setSquareBeingReplaced(null);
     } else {
@@ -232,6 +238,7 @@ const App = () => {
           />
         ))}
       </div>
+      <ScoreBoard score={scoreDisplay} />
     </div>
   );
 };
